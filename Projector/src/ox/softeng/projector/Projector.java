@@ -2,8 +2,6 @@ package ox.softeng.projector;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,7 +26,15 @@ public class Projector {
 	public static <T> JsonNode project(T inputObject, String projectionName) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException
 	{
 		System.out.println("Projecting... " + projectionName);
-		System.out.println(inputObject.getClass().toString());
+		if(inputObject == null)
+		{
+			System.err.println("null object passed to Projector.project!");
+			return null;
+		}
+		else
+		{
+			System.out.println(inputObject.getClass().toString());
+		}
 		
 		ObjectNode on = factory.objectNode();
 		for(Field f : getAllFields(new ArrayList<Field>(), inputObject.getClass()))
@@ -36,6 +42,7 @@ public class Projector {
 			System.out.println(f.getName());
 			if(isProjectable(f, projectionName, inputObject.getClass()))
 			{
+				String recurseProjection = getRecurseProjection(f, projectionName);
 				Object value = PropertyUtils.getSimpleProperty(inputObject, f.getName());
 				if(value == null)
 				{
@@ -65,7 +72,7 @@ public class Projector {
 					else if(isProjectableClass(fieldType))
 					{
 						System.out.println("projectable class: " + fieldType);
-						on.set(f.getName(), project(value, projectionName));
+						on.set(f.getName(), project(value, recurseProjection));
 					}
 					else if(Collection.class.isAssignableFrom(fieldType))
 					{
@@ -73,7 +80,7 @@ public class Projector {
 						ArrayNode an = factory.arrayNode();
 						for(Object o : (Collection<Object>)value)
 						{
-							an.add(project(o, projectionName));
+							an.add(project(o, recurseProjection));
 						}
 						on.set(f.getName(), an);
 					}
@@ -126,6 +133,34 @@ public class Projector {
 			}
 		}
 		return false;
+	}
+	
+	private static String getRecurseProjection(Field field, String projectionName)
+	{
+		Projection[] ps = getProjections(field);
+		if(ps != null)
+		{
+			for(Projection p : ps)
+			{
+				if(p.name().equalsIgnoreCase(projectionName))
+				{
+					if(p.recurseProjection() != null && !"".equals(p.recurseProjection()))
+					{
+						return p.recurseProjection();
+					}
+					else return projectionName;
+				}
+				if(p.always())
+				{
+					if(p.recurseProjection() != null && !"".equals(p.recurseProjection()))
+					{
+						return p.recurseProjection();
+					}
+					else return projectionName;
+				}
+			}
+		}
+		return projectionName;
 	}
 	
 	private static boolean isValidClass(Class<?> projectionClass, Class<?>[] allowedClasses)

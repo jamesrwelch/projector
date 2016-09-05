@@ -13,4 +13,5 @@ public @interface Projection {
 	String name() default "";
 	Class<?>[] classes() default {};
 	boolean always() default false;
+	String recurseProjection() default "";
 }
