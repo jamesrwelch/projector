@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Tester {
 
-	static ObjectMapper jacksonMapper = new ObjectMapper();
+	static ObjectMapper jacksonMapper = new ObjectMapper().findAndRegisterModules();
 
 	
 	public static void main(String[] args) throws JsonGenerationException, JsonMappingException, IOException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
