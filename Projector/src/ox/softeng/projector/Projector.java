@@ -95,7 +95,7 @@ public class Projector {
 
 	}
 	
-	public static <T> ArrayNode project(List<T> inputObjects, String projectionName) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException
+	public static <T> ArrayNode project(Collection<T> inputObjects, String projectionName) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException
 	{
 		ArrayNode an = factory.arrayNode();
 		for(T inputObject : inputObjects)
