@@ -25,15 +25,32 @@ public class Projector {
 	
 	public static <T> JsonNode project(T inputObject, String projectionName) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException
 	{
+		return project(inputObject, projectionName, null);
+	}
+	
+	
+	public static <T> JsonNode project(T inputObject, String projectionName, CallableFilterFactory<T> filterFactory) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException
+	{
 		//System.out.println("Projecting... " + projectionName);
 		if(inputObject == null)
 		{
 			//System.err.println("null object passed to Projector.project!");
 			return null;
 		}
-		else
+		if(filterFactory != null)
 		{
-			//System.out.println(inputObject.getClass().toString());
+			CallableFilter<T> filter = filterFactory.newCallableFilter(inputObject);
+			try {
+				if(!filter.call())
+				{
+					// We're not allowed to view this object!
+					return null;
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return null;
+			}
 		}
 		
 		ObjectNode on = factory.objectNode();
@@ -72,15 +89,15 @@ public class Projector {
 					else if(isProjectableClass(fieldType))
 					{
 						//System.out.println("projectable class: " + fieldType);
-						on.set(f.getName(), project(value, recurseProjection));
+						on.set(f.getName(), project((T) value, recurseProjection, filterFactory));
 					}
 					else if(Collection.class.isAssignableFrom(fieldType))
 					{
 						//System.out.println("We gotta list...");
 						ArrayNode an = factory.arrayNode();
-						for(Object o : (Collection<Object>)value)
+						for(T o : (Collection<T>)value)
 						{
-							an.add(project(o, recurseProjection));
+							an.add(project(o, recurseProjection, filterFactory));
 						}
 						on.set(f.getName(), an);
 					}
@@ -94,13 +111,18 @@ public class Projector {
 		return on;
 
 	}
-	
+
 	public static <T> ArrayNode project(Collection<T> inputObjects, String projectionName) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException
+	{
+		return project(inputObjects, projectionName, null);
+	}
+	
+	public static <T> ArrayNode project(Collection<T> inputObjects, String projectionName, CallableFilterFactory<T> filterFactory) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException
 	{
 		ArrayNode an = factory.arrayNode();
 		for(T inputObject : inputObjects)
 		{
-			an.add(project(inputObject, projectionName));
+			an.add(project(inputObject, projectionName, filterFactory));
 		}
 		return an;
 	}

@@ -21,7 +21,7 @@ public class Tester {
 		TestClassB b = new TestClassB();
 		b.setName("b");
 		a.setB(Arrays.asList(b));
-		JsonNode db = Projector.project(a, "proj2");
+		JsonNode db = Projector.project(a, "proj2", null);
 		jacksonMapper.writeValue(System.out, db);
 	}
 	
