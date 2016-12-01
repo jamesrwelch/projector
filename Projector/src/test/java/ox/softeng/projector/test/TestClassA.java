@@ -1,4 +1,4 @@
-package ox.softeng.projector;
+package ox.softeng.projector.test;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ public class TestClassA {
 	private String name;
 	
 	
-	@Projection(name="proj2", classes={})
+	//@Projection(name="proj2", classes={})
 	private Integer age;
 	
 	@Projection(name="proj2")

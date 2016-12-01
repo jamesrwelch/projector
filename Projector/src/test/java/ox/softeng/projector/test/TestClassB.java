@@ -1,4 +1,4 @@
-package ox.softeng.projector;
+package ox.softeng.projector.test;
 
 import ox.softeng.projector.annotations.Projectable;
 import ox.softeng.projector.annotations.Projection;

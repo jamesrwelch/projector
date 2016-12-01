@@ -112,10 +112,15 @@ public class Projector {
 
 	}
 
-	/*public static <T> ArrayNode project(Collection<T> inputObjects, String projectionName) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException
+	public static <T> ArrayNode project(Collection<T> inputObjects, String projectionName) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException
 	{
-		return project(inputObjects, projectionName, null);
-	}*/
+		ArrayNode an = factory.arrayNode();
+		for(T inputObject : inputObjects)
+		{
+			an.add(project(inputObject, projectionName, null));
+		}
+		return an;
+	}
 	
 	public static <T> ArrayNode project(Collection<T> inputObjects, String projectionName, CallableFilterFactory<T> filterFactory) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException
 	{
