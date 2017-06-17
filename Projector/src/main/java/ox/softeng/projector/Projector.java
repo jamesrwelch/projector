@@ -27,14 +27,15 @@ public class Projector {
 	{
 		return project(inputObject, projectionName, null);
 	}
-	
-	
+
+
+
 	public static <T> JsonNode project(T inputObject, String projectionName, CallableFilterFactory<T> filterFactory) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException
 	{
-		//System.out.println("Projecting... " + projectionName);
+		System.out.println("Projecting... " + projectionName);
 		if(inputObject == null)
 		{
-			//System.err.println("null object passed to Projector.project!");
+			System.err.println("null object passed to Projector.project!");
 			return null;
 		}
 		if(filterFactory != null)
@@ -43,6 +44,7 @@ public class Projector {
 			try {
 				if(!filter.call())
 				{
+				    System.err.println("We're not allowed to view this object!");
 					// We're not allowed to view this object!
 					return null;
 				}
@@ -56,7 +58,7 @@ public class Projector {
 		ObjectNode on = factory.objectNode();
 		for(Field f : getAllFields(new ArrayList<Field>(), inputObject.getClass()))
 		{
-			//System.out.println(f.getName());
+			System.out.println(f.getName());
 			if(isProjectable(f, projectionName, inputObject.getClass()))
 			{
 				String recurseProjection = getRecurseProjection(f, projectionName);
@@ -68,7 +70,7 @@ public class Projector {
 				}
 				else
 				{
-					//System.out.println(f.getType());
+					System.out.println(f.getType());
 					Class<?> fieldType = f.getType();
 					if(fieldType == String.class)
 					{
@@ -88,12 +90,12 @@ public class Projector {
 					}
 					else if(isProjectableClass(fieldType))
 					{
-						//System.out.println("projectable class: " + fieldType);
+						System.out.println("projectable class: " + fieldType);
 						on.set(f.getName(), project((T) value, recurseProjection, filterFactory));
 					}
 					else if(Collection.class.isAssignableFrom(fieldType))
 					{
-						//System.out.println("We gotta list...");
+						System.out.println("We gotta list...");
 						ArrayNode an = factory.arrayNode();
 						for(T o : (Collection<T>)value)
 						{
