@@ -33,6 +33,7 @@ public class Projector {
 	public static <T> JsonNode project(T inputObject, String projectionName, CallableFilterFactory<T> filterFactory) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException
 	{
 		System.out.println("Projecting... " + projectionName);
+        System.out.println("Projecting... " + inputObject.getClass().getName());
 		if(inputObject == null)
 		{
 			System.err.println("null object passed to Projector.project!");
@@ -99,7 +100,10 @@ public class Projector {
 						ArrayNode an = factory.arrayNode();
 						for(T o : (Collection<T>)value)
 						{
-							an.add(project(o, recurseProjection, filterFactory));
+						    JsonNode projectedChild = project(o, recurseProjection, filterFactory);
+						    if(projectedChild != null) {
+                                an.add(projectedChild);
+                            }
 						}
 						on.set(f.getName(), an);
 					}
